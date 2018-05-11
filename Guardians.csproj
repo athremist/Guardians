@@ -283,17 +283,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Data\ItemData.cs" />
+    <Compile Include="Assets\Scripts\Helpers\DebugDrawTileIndex.cs" />
     <Compile Include="Assets\Scripts\Interactable\Character\NPC.cs" />
     <Compile Include="Assets\Scripts\Interactable\Character\NurseJoy.cs" />
     <Compile Include="Assets\Scripts\Interactable\Character\Trainer.cs" />
+    <Compile Include="Assets\Scripts\Interactable\IInteract.cs" />
     <Compile Include="Assets\Scripts\Interactable\Interactable.cs" />
     <Compile Include="Assets\Scripts\Interactable\Object\FieldObject.cs" />
     <Compile Include="Assets\Scripts\Interactable\Object\Pickup.cs" />
-    <Compile Include="Assets\Scripts\Player\Player.cs" />
+    <Compile Include="Assets\Scripts\Player\PlayerData.cs" />
     <Compile Include="Assets\Scripts\Player\Playermovement.cs" />
     <Compile Include="Assets\Scripts\Pokemon\PokemonData.cs" />
+    <Compile Include="Assets\Scripts\Tile\Map.cs" />
     <Compile Include="Assets\Scripts\Tile\Tile.cs" />
-    <Compile Include="Assets\Scripts\Tile\TileManager.cs" />
+    <Compile Include="Assets\Scripts\Tile\World.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\ProjectSettings\ProjectVersion.txt" />

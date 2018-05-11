@@ -7,7 +7,6 @@ public class FieldObject
     bool Respawnable;
     bool Destroyable;
 
-
     public FieldObject()
     {
 
