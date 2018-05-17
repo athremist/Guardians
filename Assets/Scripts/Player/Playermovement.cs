@@ -5,19 +5,18 @@ using UnityEngine;
 
 public class Playermovement : MonoBehaviour
 {
-    const float TILEOFFSET = 0.5f;
     const float WALK_SPEED = 0.3f;
     const float RUN_SPEED = 0.15f;
     const float SURF_SPEED = 0.2f;
 
-    PlayerData Player;
-    int MostRecentDirectionPressed = 0;
-    float DirectionChangeInputDelay = 0.08f;
-    float Speed;
-    float Increment = 1f;
-    bool CanInput = true;
+    private PlayerData Player;
+    private int MostRecentDirectionPressed = 0;
+    private float DirectionChangeInputDelay = 0.08f;
+    private float Speed;
+    private float Increment = 1f;
+    private bool CanInput = true;
 
-    public GameObject busyWith;
+    public IInteract busyWith;//Gameobject busyWith
     public int Direction = 2; //0 = up, 1 = right, 2 = down, 3 = left
 
     public bool Moving { get; private set; }
@@ -67,7 +66,7 @@ public class Playermovement : MonoBehaviour
             if (CanInput)
             {
                 //if(not surfing or biking check for running
-                if (!Surfing  && !OnBike)
+                if (!Surfing && !OnBike)
                 {
                     if (Input.GetKey(KeyCode.Space))//(Input.GetButton("Run"))
                     {
@@ -98,11 +97,14 @@ public class Playermovement : MonoBehaviour
                     //do pause stuff
                     //while menu active yield return null
                 }
-                else if(Input.GetKey(KeyCode.E))//(Input.GetButton("Select"))
+                else if (Input.GetKey(KeyCode.E))//(Input.GetButton("Select"))
                 {
-                    if (Player.CurrentTile.GetInteractable() != null)
+                    Tile nextTile = Player.CurrentMap.GetNextTile(Player.CurrentTile, GetForwardVector());
+                    if(nextTile.GetInteractable() != null)//(SetCheckBusyWith(nextTile.GetInteractable()))
                     {
-                        Player.CurrentTile.GetInteractable().Interact();
+                        nextTile.GetInteractable().Interact(Player);
+                        //UnsetCheckBusyWith(nextTile.GetInteractable());
+                        DestroyObject(nextTile.RemovePickup());
                     }
                 }
                 //else if (Input.GetButton("Keyitem"))
@@ -115,11 +117,15 @@ public class Playermovement : MonoBehaviour
                 {
                     UpdateDirection(MostRecentDirectionPressed);
 
-                    //if(key is held if false then turn
-                    //Current direction was held then lets move forward
-                    //else we move if not turning
+                    Tile nextTile = Player.CurrentMap.GetNextTile(Player.CurrentTile, GetForwardVector());
+                    if (nextTile.IsWalkable() == true && nextTile.GetInteractable() == null)
                     {
-                        Moving = true;
+                        //if(key is held if false then turn
+                        //Current direction was held then lets move forward
+                        //else we move if not turning
+                        {
+                            Moving = true;
+                        }
                     }
 
                     if (Moving)
@@ -191,7 +197,7 @@ public class Playermovement : MonoBehaviour
             //else
             Vector3 startPosition = Player.CurrentTile.GetTileCoordinates();//StartPosition
             Vector2 endPostition = startPosition + movement;
-            startPosition = new Vector3(startPosition.x + TILEOFFSET, startPosition.y + TILEOFFSET, 0);
+            startPosition = new Vector3(startPosition.x, startPosition.y, 0);
             //Tiles are offset due to how the tilemaps in unity work so there you have it^
             Moving = true;
             Increment = 0;
@@ -223,7 +229,7 @@ public class Playermovement : MonoBehaviour
     }
 
     //Attempts to set player to be busy with "aCaller" and pauses input, returning true if the request worked
-    public bool SetCheckBusyWith(GameObject aCaller)
+    public bool SetCheckBusyWith(IInteract aCaller)
     {
         if (busyWith == null)
         {
@@ -233,14 +239,14 @@ public class Playermovement : MonoBehaviour
         if (busyWith == aCaller)
         {
             //TODO: can input = false;
-            Debug.Log("Busy with" + busyWith);
+            Debug.Log("Busy with " + busyWith);
             return true;
         }
 
         return false;
     }
 
-    public void UnsetCheckBusyWith(GameObject aCaller)
+    public void UnsetCheckBusyWith(IInteract aCaller)
     {
         if (busyWith == aCaller)
         {
@@ -258,7 +264,7 @@ public class Playermovement : MonoBehaviour
         }
         else
         {
-            Debug.Log("Busy with" + busyWith);
+            Debug.Log("Busy with " + busyWith);
         }
     }
 

@@ -78,4 +78,9 @@ public class World : MonoBehaviour
 
         return null;
     }
+
+    public Map GetMap(int aIndex)
+    {
+        return Maps[aIndex];
+    }
 }

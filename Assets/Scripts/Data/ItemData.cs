@@ -55,108 +55,111 @@ public class ItemData
         this.Name = aName;
     }
 
-    /*public ItemData(string name, ItemType itemType, BattleType battleType, string description, int price,
+    public ItemData(string name, ItemType itemType, BattleType battleType, string description, int price,
         ItemEffect itemEffect)
     {
-        this.name = name;
-        this.itemType = itemType;
-        this.battleType = battleType;
-        this.description = description;
-        this.price = price;
-        this.itemEffect = itemEffect;
+        this.Name = name;
+        this.Item_Type = itemType;
+        this.Battle_Type = battleType;
+        this.Description = description;
+        this.Price = price;
+        this.Item_Effect = itemEffect;
     }
 
+    //Last arguement ex: Full heal, heals 'all' status
     public ItemData(string name, ItemType itemType, BattleType battleType, string description, int price,
         ItemEffect itemEffect, string stringParameter)
     {
-        this.name = name;
-        this.itemType = itemType;
-        this.battleType = battleType;
-        this.description = description;
-        this.price = price;
-        this.itemEffect = itemEffect;
-        this.stringParameter = stringParameter;
+        this.Name = name;
+        this.Item_Type = itemType;
+        this.Battle_Type = battleType;
+        this.Description = description;
+        this.Price = price;
+        this.Item_Effect = itemEffect;
+        this.StringParameter = stringParameter;
     }
 
+    //Last arguement ex: Ether adds'10f' pp, or pokeball effect is 'x1'(1f).
     public ItemData(string name, ItemType itemType, BattleType battleType, string description, int price,
         ItemEffect itemEffect, float floatParameter)
     {
-        this.name = name;
-        this.itemType = itemType;
-        this.battleType = battleType;
-        this.description = description;
-        this.price = price;
-        this.itemEffect = itemEffect;
-        this.floatParameter = floatParameter;
+        this.Name = name;
+        this.Item_Type = itemType;
+        this.Battle_Type = battleType;
+        this.Description = description;
+        this.Price = price;
+        this.Item_Effect = itemEffect;
+        this.FloatParameter = floatParameter;
     }
 
+    //Last 2 arguments ex: Elixer Restores 'all' moves pp, and by '10f' pp.
     public ItemData(string name, ItemType itemType, BattleType battleType, string description, int price,
         ItemEffect itemEffect, string stringParameter, float floatParameter)
     {
-        this.name = name;
-        this.itemType = itemType;
-        this.battleType = battleType;
-        this.description = description;
-        this.price = price;
-        this.itemEffect = itemEffect;
-        this.stringParameter = stringParameter;
-        this.floatParameter = floatParameter;
+        this.Name = name;
+        this.Item_Type = itemType;
+        this.Battle_Type = battleType;
+        this.Description = description;
+        this.Price = price;
+        this.Item_Effect = itemEffect;
+        this.StringParameter = stringParameter;
+        this.FloatParameter = floatParameter;
     }
 
     //TMs
     public ItemData(int tmNo, string name, ItemType itemType, BattleType battleType, string description, int price)
     {
-        this.tmNo = tmNo;
-        this.name = name;
-        this.itemType = itemType;
-        this.battleType = battleType;
-        this.description = description;
-        this.price = price;
-        this.itemEffect = ItemEffect.TM;
+        this.TmNo = tmNo;
+        this.Name = name;
+        this.Item_Type = itemType;
+        this.Battle_Type = battleType;
+        this.Description = description;
+        this.Price = price;
+        this.Item_Effect = ItemEffect.TM;
     }
 
     public string getName()
     {
-        return name;
+        return Name;
     }
 
     public ItemType getItemType()
     {
-        return itemType;
+        return Item_Type;
     }
 
     public BattleType getBattleType()
     {
-        return battleType;
+        return Battle_Type;
     }
 
     public string getDescription()
     {
-        return description;
+        return Description;
     }
 
     public int getPrice()
     {
-        return price;
+        return Price;
     }
 
     public int getTMNo()
     {
-        return tmNo;
+        return TmNo;
     }
 
     public ItemEffect getItemEffect()
     {
-        return itemEffect;
+        return Item_Effect;
     }
 
     public string getStringParameter()
     {
-        return stringParameter;
+        return StringParameter;
     }
 
     public float getFloatParameter()
     {
-        return floatParameter;
-    }*/
+        return FloatParameter;
+    }
 }

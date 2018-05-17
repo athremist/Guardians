@@ -292,6 +292,7 @@
     <Compile Include="Assets\Scripts\Interactable\Interactable.cs" />
     <Compile Include="Assets\Scripts\Interactable\Object\FieldObject.cs" />
     <Compile Include="Assets\Scripts\Interactable\Object\Pickup.cs" />
+    <Compile Include="Assets\Scripts\Player\Bag.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerData.cs" />
     <Compile Include="Assets\Scripts\Player\Playermovement.cs" />
     <Compile Include="Assets\Scripts\Pokemon\PokemonData.cs" />

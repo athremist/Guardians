@@ -143,7 +143,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 10100, guid: 0000000000000000e000000000000000, type: 0}
+  - {fileID: 2100000, guid: 35076fc3dff102f4e8fc463893f67434, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -299,7 +299,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1ae8303c9a380141a57d16c3e68b2d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  busyWith: {fileID: 0}
   Direction: 2
   Strength: 0
 --- !u!114 &1342255154
@@ -426,6 +425,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NumOfTiles: 0
   TileDebugHelper: 1
+  Pickups:
+  - PickupName: Pokeball
+    TileIndex: 418
+  - PickupName: Greatball
+    TileIndex: 425
+  - PickupName: Tm01
+    TileIndex: 366
 --- !u!1 &1991374389
 GameObject:
   m_ObjectHideFlags: 0

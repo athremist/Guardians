@@ -2,22 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Pickup : MonoBehaviour, IInteract
+public class Pickup : IInteract
 {
-    public ItemData.ItemType type;
-    public string name;
-    public bool tm;
+    public GameObject Sprite;
+    public string Name;
+    public bool Tm;
 
-    //Will inherit from interactable
-
-    public void Interact()
+    public Pickup(string aName, Vector2 aPos, GameObject aSprite)
     {
-        Debug.Log("YOU GOT HM01 YAY!");
-        Destroy(this.gameObject);
+        //TODO:
+        ItemData.ItemType type = ItemData.ItemType.Item;
+        //type = ItemDatabase.GetItem(aName).ItemType
+        Name = aName;
+        if (type == ItemData.ItemType.Tm)
+        {
+            Tm = true;
+        }
+
+        Sprite = aSprite;
     }
 
-    public Pickup()
+    public void Interact(PlayerData aPlayer)
     {
-
+        aPlayer.Bag.AddItem(Name);
     }
 }

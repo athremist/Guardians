@@ -24,7 +24,6 @@ public class DebugDrawTileIndex : MonoBehaviour
     {
         Font font = (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf");
         Color color = Color.black;
-        Vector2 offSet = new Vector2(0.5f, 0.5f);
         string name = "Tile";
         float scaleMod = (DebugCanvas.transform as RectTransform).sizeDelta.x;
 
@@ -40,7 +39,7 @@ public class DebugDrawTileIndex : MonoBehaviour
             index.alignment = TextAnchor.MiddleCenter;
 
             //Multiplying the reverse scale of what the canvas will to have proper positions
-            newText.transform.position = (Map.GetTile(i).GetTileCoordinates() + offSet) * 20;//20 = scale
+            newText.transform.position = (Map.GetTile(i).GetTileCoordinates()) * 20;//20 = scale
             newText.transform.SetParent(DebugCanvas.transform);
             listOfIndexes.Add(newText);
 

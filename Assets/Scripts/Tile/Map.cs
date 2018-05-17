@@ -6,12 +6,12 @@ using UnityEditor;
 
 public class Map : MonoBehaviour
 {
-    //public Pickup[] pickups;
+    private Tile[] MapTiles;
 
-    Tile[] MapTiles;
-
+    [HideInInspector]
     public int NumOfTiles;
     public bool TileDebugHelper = false;//For editor use only
+    public PickupList[] Pickups;
 
     void Awake()
     {
@@ -20,6 +20,8 @@ public class Map : MonoBehaviour
 
     void Start()
     {
+        AddPickupToMap();
+
         if (TileDebugHelper)
         {
             gameObject.AddComponent<DebugDrawTileIndex>();
@@ -59,6 +61,7 @@ public class Map : MonoBehaviour
             ///</ summary >
             pos.x = map.origin.x + Mathf.Abs(i % mapSize.x);
             pos.y = map.origin.y + Mathf.Abs(i / mapSize.x);
+            float tileMapOffset = 0.5f;//Cuz tiles from a tilemap anchor is the bottom left corner
 
             if (map.GetSprite(pos) != null)
             {
@@ -73,21 +76,13 @@ public class Map : MonoBehaviour
             if (name != "")
             {
                 name = GetTileTypeNameFromSprite(name);
-
-                tile = new Tile(this, new Vector2(pos.x, pos.y), (Tile.TileType)System.Enum.Parse(typeof(Tile.TileType), name));
+                //Add offset for MY tile data ^_^
+                tile = new Tile(this, new Vector2(pos.x + tileMapOffset, pos.y + tileMapOffset), 
+                                (Tile.TileType)System.Enum.Parse(typeof(Tile.TileType), name));
                 MapTiles[i] = tile;
                 //Debug.Log(tile.GetTileType());
             }
         }
-
-        /*Tile tile;
-        tile = new Tile();
-        //example
-        if ((Pickup)tile.Object() != null)
-        {
-
-        }*/
-        //Debug.Log(name);
     }
 
     //Extract the type of tile from the name of the sprite
@@ -186,4 +181,28 @@ public class Map : MonoBehaviour
 
         return path;
     }
+
+    public void AddPickupToMap()
+    {
+        Tile tile;
+
+        for (int i = 0; i < Pickups.Length; i++)
+        {
+            tile = MapTiles[Pickups[i].TileIndex];
+
+            GameObject temp = new GameObject(Pickups[i].PickupName);
+            GameObject sprite = Instantiate(temp, tile.GetTileCoordinates(), Quaternion.identity);
+            sprite.AddComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Item_Sprite");// new Sprite();
+            Destroy(temp);
+
+            MapTiles[Pickups[i].TileIndex].AddPickup(Pickups[i].PickupName, sprite);
+        }
+    }
+}
+
+[System.Serializable]
+public class PickupList
+{
+    public string PickupName;
+    public int TileIndex;
 }

@@ -16,10 +16,10 @@ public class Tile
     }
 
     Map Map;
+    Pickup Pickup; //What pickup is on the tile/non
     Vector2 Coords; //Position of tile on the map
     TileType Type; //What kind of tile
     IInteract Interactable;
-    //Pickup Pickup; //What pickup is on the tile/non
     //int LedgeDirection;
     bool Walkable; //Is the tile walkable?
 
@@ -33,11 +33,31 @@ public class Tile
         Map = aMap;
         Coords = aCoodinates;
         Type = aTileType;
+        SetWalkable(aTileType);
     }
 
     public Map GetMap()
     {
         return Map;
+    }
+
+    public Pickup GetPickup()
+    {
+        return Pickup;
+    }
+
+    public void AddPickup(string aName, GameObject aSprite)
+    {
+        Pickup = new Pickup(aName, Coords, aSprite);
+        Interactable = Pickup;
+    }
+
+    public GameObject RemovePickup()
+    {
+        GameObject sprite = Pickup.Sprite;
+        Pickup = null;
+        Interactable = null;
+        return sprite;
     }
 
     public Vector2 GetTileCoordinates()
