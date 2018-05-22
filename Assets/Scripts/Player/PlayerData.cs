@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerData : MonoBehaviour
 {
-    const int STARTING_TILE = 250;//Index
+    const int STARTING_TILE = 238;//Index
 
     string Name = "RED";
     //money/name/badges/bag?/pokedex?/etc
@@ -23,11 +23,6 @@ public class PlayerData : MonoBehaviour
         transform.position = new Vector3(CurrentTile.GetTileCoordinates().x, CurrentTile.GetTileCoordinates().y);
 
         Bag = new Bag();
-    }
-
-    void Update()
-    {
-
     }
 
     public void ChangeMap()

@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class World : MonoBehaviour
 {
+    const float MAP_DIST_MOD = 0.05f;//0.05f = 1/20 (Dist being 20)
+
     //Sprite TownMap;
     Map[] Maps;
+
     public string StartingMap = "Sapwood Town";
 
     void Awake()
@@ -35,6 +38,7 @@ public class World : MonoBehaviour
 
             if (map != null)
             {
+                Vector2 pos = new Vector2(map.transform.position.x, map.transform.position.y);
                 Maps[i] = map;
                 Debug.Log(Maps[i].name);
             }
@@ -82,5 +86,41 @@ public class World : MonoBehaviour
     public Map GetMap(int aIndex)
     {
         return Maps[aIndex];
+    }
+
+    //To be used for now
+    public Map GetNextMap(Map aCurrentMap, int aDirection)
+    {
+        int index = aCurrentMap.GetAdjacentMapIndex(aDirection);
+        Map map = GetMap(index);
+
+        if (map != null)
+        {
+            return map;
+        }
+
+        return null;
+    }
+
+    private void SelectMapConntions()
+    {
+        //  byte[] maps = Nou,Eas,Sou,Wes
+        //Map 1-SapwoodTown
+        {
+            byte[] maps = { 1, 0, 1, 0};
+            SetMapConnections(1, maps);
+        }
+        //Map 2-Route1
+        {
+            byte[] maps = { 2, 0, 0, 0 };
+            SetMapConnections(2, maps);
+        }
+
+    }
+
+    //To be moved to a map manager which will set all of this up
+    private void SetMapConnections(int aMapIndex, byte[] aConnections)
+    {
+        Maps[aMapIndex].SetAdjacentMaps(aConnections);
     }
 }

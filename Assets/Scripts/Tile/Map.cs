@@ -7,7 +7,8 @@ using UnityEditor;
 public class Map : MonoBehaviour
 {
     private Tile[] MapTiles;
-
+    private byte[] AdjacentMapIndexes;//0-North,1-East,2-South,3-West
+    //Using a byte as we only need 4 numbers
     [HideInInspector]
     public int NumOfTiles;
     public bool TileDebugHelper = false;//For editor use only
@@ -16,6 +17,7 @@ public class Map : MonoBehaviour
     void Awake()
     {
         InitializeTiles();
+        AdjacentMapIndexes = new byte[4];//One for each direction
     }
 
     void Start()
@@ -61,7 +63,7 @@ public class Map : MonoBehaviour
             ///</ summary >
             pos.x = map.origin.x + Mathf.Abs(i % mapSize.x);
             pos.y = map.origin.y + Mathf.Abs(i / mapSize.x);
-            float tileMapOffset = 0.5f;//Cuz tiles from a tilemap anchor is the bottom left corner
+            float tileMapOffset = 0.5f;//Cuz tiles' anchor from a tilemap is the bottom left corner
 
             if (map.GetSprite(pos) != null)
             {
@@ -197,6 +199,19 @@ public class Map : MonoBehaviour
 
             MapTiles[Pickups[i].TileIndex].AddPickup(Pickups[i].PickupName, sprite);
         }
+    }
+
+    public void SetAdjacentMaps(byte[] aIndexes)
+    {
+        for (int i = 0; i < AdjacentMapIndexes.Length; i++)
+        {
+            AdjacentMapIndexes[i] = aIndexes[i];
+        }
+    }
+
+    public byte GetAdjacentMapIndex(int aDir)
+    {
+        return AdjacentMapIndexes[aDir];
     }
 }
 
