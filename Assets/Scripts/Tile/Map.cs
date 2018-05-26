@@ -8,11 +8,13 @@ public class Map : MonoBehaviour
 {
     private Tile[] MapTiles;
     private byte[] AdjacentMapIndexes;//0-North,1-East,2-South,3-West
+    private int NumberHorizontalTiles;
     //Using a byte as we only need 4 numbers
     [HideInInspector]
     public int NumOfTiles;
     public bool TileDebugHelper = false;//For editor use only
     public PickupList[] Pickups;
+    public DoorConnections[] ConnectedDoors;
 
     void Awake()
     {
@@ -30,11 +32,6 @@ public class Map : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-
-    }
-
     void InitializeTiles()
     {
         //Used to extract data from tilemap to use for the tile data, due to it being a lot easier to build & design
@@ -43,13 +40,16 @@ public class Map : MonoBehaviour
 
         Vector2Int mapSize = new Vector2Int(map.cellBounds.size.x, map.cellBounds.size.y);
         NumOfTiles = mapSize.x * mapSize.y;
+        NumberHorizontalTiles = mapSize.y;
 
         MapTiles = new Tile[NumOfTiles];
         //Variables to store data from the tilemap to be used for initializing tiles.
         string name = "";
         Vector3Int pos = new Vector3Int(0, 0, 0);
+        Vector3Int mapOriginWorld = Vector3Int.FloorToInt(map.CellToWorld(map.origin));//Worldpos origin
+        float tileMapOffset = 0.5f;//Cuz tiles' anchor from a tilemap is the bottom left corner
         Tile tile;
-
+        
         for (int i = 0; i < NumOfTiles; i++)
         {
             ///<summary> Explanation of what's going on for x and y coords;
@@ -63,8 +63,7 @@ public class Map : MonoBehaviour
             ///</ summary >
             pos.x = map.origin.x + Mathf.Abs(i % mapSize.x);
             pos.y = map.origin.y + Mathf.Abs(i / mapSize.x);
-            float tileMapOffset = 0.5f;//Cuz tiles' anchor from a tilemap is the bottom left corner
-
+            //Get sprite name from tile from tilemap
             if (map.GetSprite(pos) != null)
             {
                 name = map.GetSprite(pos).name;
@@ -74,6 +73,9 @@ public class Map : MonoBehaviour
                 name = "";
                 Debug.LogError("Sprite not loaded");
             }
+            //Now that we got the sprite name we will set tile position according to origin's world pos
+            pos.x = mapOriginWorld.x + Mathf.Abs(i % mapSize.x);
+            pos.y = mapOriginWorld.y + Mathf.Abs(i / mapSize.x);
 
             if (name != "")
             {
@@ -82,7 +84,6 @@ public class Map : MonoBehaviour
                 tile = new Tile(this, new Vector2(pos.x + tileMapOffset, pos.y + tileMapOffset), 
                                 (Tile.TileType)System.Enum.Parse(typeof(Tile.TileType), name));
                 MapTiles[i] = tile;
-                //Debug.Log(tile.GetTileType());
             }
         }
     }
@@ -113,7 +114,7 @@ public class Map : MonoBehaviour
             }
         }
 
-        Debug.LogError("No 'next' tile found");
+        //Debug.LogError("No 'next' tile found");
         return null;
     }
 
@@ -165,7 +166,7 @@ public class Map : MonoBehaviour
         }
         else
         {
-            dir = aDirection.y * NumOfTiles; //index of next tile going up or down
+            dir = aDirection.y * NumberHorizontalTiles; //index of next tile going up or down
         }
 
         for (int i = 0; i < aRange; i++)
@@ -194,11 +195,39 @@ public class Map : MonoBehaviour
 
             GameObject temp = new GameObject(Pickups[i].PickupName);
             GameObject sprite = Instantiate(temp, tile.GetTileCoordinates(), Quaternion.identity);
-            sprite.AddComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Item_Sprite");// new Sprite();
+            sprite.transform.SetParent(this.transform);
+            sprite.AddComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Item_Sprite");
+            if (Pickups[i].Invisible) sprite.GetComponent<SpriteRenderer>().sortingOrder = -7;
             Destroy(temp);
 
             MapTiles[Pickups[i].TileIndex].AddPickup(Pickups[i].PickupName, sprite);
         }
+    }
+
+    public int GetConnectedMapIndex(int aDoorIndex)
+    {
+        for (int i = 0; i < ConnectedDoors.Length; i++)
+        {
+            if (aDoorIndex == ConnectedDoors[i].DoorIndex)
+            {
+                return ConnectedDoors[i].MapConnectionIndex;
+            }
+        }
+
+        return 0;
+    }
+
+    public int GetConnectedDoorIndex(int aDoorIndex)
+    {
+        for (int i = 0; i < ConnectedDoors.Length; i++)
+        {
+            if (aDoorIndex == ConnectedDoors[i].DoorIndex)
+            {
+                return ConnectedDoors[i].DoorConnectionIndex;
+            }
+        }
+
+        return 0;
     }
 
     public void SetAdjacentMaps(byte[] aIndexes)
@@ -220,4 +249,13 @@ public class PickupList
 {
     public string PickupName;
     public int TileIndex;
+    public bool Invisible;
+}
+
+[System.Serializable]
+public class DoorConnections
+{
+    public int DoorIndex;
+    public int MapConnectionIndex;
+    public int DoorConnectionIndex;
 }

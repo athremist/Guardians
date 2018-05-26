@@ -8,6 +8,7 @@ public class Playermovement : MonoBehaviour
     const float WALK_SPEED = 0.3f;
     const float RUN_SPEED = 0.15f;
     const float SURF_SPEED = 0.2f;
+    const float FADE_TRANSTITION = 0.4f;
 
     private PlayerData Player;
     private int MostRecentDirectionPressed = 0;
@@ -15,6 +16,7 @@ public class Playermovement : MonoBehaviour
     private float Speed;
     private float Increment = 1f;
     private bool CanInput = true;
+    private bool IsOutside = true;
 
     public IInteract busyWith;//Gameobject busyWith
     public int Direction = 2; //0 = up, 1 = right, 2 = down, 3 = left
@@ -121,7 +123,7 @@ public class Playermovement : MonoBehaviour
                 }
                 else if ((Input.GetButtonDown("Select")))
                 {
-                    Tile nextTile = Player.CurrentMap.GetNextTile(Player.CurrentTile, GetForwardVector());
+                    Tile nextTile = Player.Map.GetNextTile(Player.CurrentTile, GetForwardVector());
                     if (nextTile.GetInteractable() != null)//(SetCheckBusyWith(nextTile.GetInteractable()))
                     {
                         nextTile.GetInteractable().Interact(Player);
@@ -203,6 +205,11 @@ public class Playermovement : MonoBehaviour
                     }
                 }
             }
+            if (still)
+            {
+                Moving = false;
+            }
+
             yield return null;
         }
     }
@@ -311,17 +318,18 @@ public class Playermovement : MonoBehaviour
 
         if (movement != Vector3.zero)
         {
-            Tile nextTile = Player.CurrentMap.GetNextTile(Player.CurrentTile, movement);
+            Tile currentTile = Player.CurrentTile;
+            Tile nextTile = Player.Map.GetNextTile(currentTile, movement);
+            Map nextMap = null;
 
             if (nextTile == null)
             {
                 //If we got here, we are most likely trying to check for a tile from a
                 //different map, so lets do a map check
-                Map nextMap = Player.World.GetNextMap(Player.CurrentMap, Direction);
-
+                nextMap = Player.World.GetNextMap(Player.Map, Direction);
                 if (nextMap != null)
                 {
-                    nextTile = nextMap.GetTile(nextTile.GetTileCoordinates());
+                    nextTile = nextMap.GetNextTile(currentTile, movement);
                 }
                 else
                 {
@@ -339,7 +347,7 @@ public class Playermovement : MonoBehaviour
                 }
                 else if (nextTile.GetTileType() == Tile.TileType.Ledge)
                 {
-                    if (nextTile.IsWalkable(Direction))
+                    if (nextTile.IsWalkable(Direction))//Parameter used for ledge tiletypes
                     {
                         ableToMove = true;
                         //Jump
@@ -347,23 +355,67 @@ public class Playermovement : MonoBehaviour
                 }
                 else
                 {
-                    if (nextTile.IsWalkable())//Parameter used for ledge tiletypes
+                    if (nextTile.IsWalkable())
                     {
-                        if (Surfing && nextTile.GetTileType() != Tile.TileType.Water)
-                        {
-                            //Moving off of a water tile
-                            //Update anim here
-                            Speed = WALK_SPEED;
-                            Surfing = false;
+                        if (nextTile.GetTileType() == Tile.TileType.Door && IsOutside)
+                        {   //Outside
+                            int tileIndex = Player.Map.GetTileIndex(nextTile.GetTileCoordinates());
+
+                            int mapIndex = Player.Map.GetConnectedMapIndex(tileIndex);
+                            int connectedTileIndex = Player.Map.GetConnectedDoorIndex(tileIndex);
+                            // No encounters if entering through a door
+                            ableToMove = true;
+                            yield return StartCoroutine(Move(movement, false));
+                            //Now enter
+                            yield return StartCoroutine(Teleport(mapIndex, connectedTileIndex));
                         }
+                        else if (nextTile.GetTileType() == Tile.TileType.Stairs)
+                        {
+                            int tileIndex = Player.Map.GetTileIndex(nextTile.GetTileCoordinates());
 
-                        //Change map here.
+                            int mapIndex = Player.Map.GetConnectedMapIndex(tileIndex);
+                            int connectedTileIndex = Player.Map.GetConnectedDoorIndex(tileIndex);
+                            //Go up/down
+                            yield return StartCoroutine(Teleport(mapIndex, connectedTileIndex));
+                        }
+                        else
+                        {
+                            if (Surfing && nextTile.GetTileType() != Tile.TileType.Water)
+                            {
+                                //Moving off of a water tile
+                                //Update anim here
+                                Speed = WALK_SPEED;
+                                Surfing = false;
+                            }
 
-                        ableToMove = true;
-                        yield return StartCoroutine(Move(movement));
-                        //Make sure current tile is set correctly
-                        Vector2 endPosition = nextTile.GetTileCoordinates();
-                        Player.CurrentTile = Player.CurrentMap.GetTile(endPosition);
+                            //Change map here if changed.
+                            if (nextMap != null)
+                            {
+                                Player.ChangeMap(nextMap);
+                            }
+
+                            ableToMove = true;
+                            yield return StartCoroutine(Move(movement));
+                            //Make sure current tile is set correctly
+                            Vector2 endPosition = nextTile.GetTileCoordinates();
+                            Player.CurrentTile = Player.Map.GetTile(endPosition);
+                        }
+                    }
+                    else if (!IsOutside)
+                    {
+                        if (currentTile.GetTileType() == Tile.TileType.Door)
+                        {   //Inside
+                            int tileIndex = Player.Map.GetTileIndex(currentTile.GetTileCoordinates());
+
+                            int mapIndex = Player.Map.GetConnectedMapIndex(tileIndex);
+                            int connectedTileIndex = Player.Map.GetConnectedDoorIndex(tileIndex);
+
+                            ableToMove = true;
+                            //Exit
+                            yield return StartCoroutine(Teleport(mapIndex, connectedTileIndex));
+                            //Now move, no encounters if exiting through a door
+                            ForceMoveForward();//yield return StartCoroutine(ForceMoveForward());
+                        }
                     }
                 }
             }
@@ -400,10 +452,12 @@ public class Playermovement : MonoBehaviour
                 yield return null;
             }
 
+            Player.CurrentTile = Player.Map.GetTile(transform.position);
+
             //Now we check for encounters(hehe ^_^) unless disabled
             if (aEncounter)
             {
-                Tile tile = Player.CurrentMap.GetTile(transform.position);
+                Tile tile = Player.CurrentTile;
 
                 if (tile.GetTileType() == Tile.TileType.Water)
                 {
@@ -416,5 +470,60 @@ public class Playermovement : MonoBehaviour
 
             }
         }
+    }
+
+    public void ForceMoveForward(int aSpaces = 1)
+    {
+        StartCoroutine(ForceMoveForwardIE(aSpaces));
+    }
+
+    public IEnumerator ForceMoveForwardIE(int aSpaces = 1)
+    {   //Pause input for as long as it takes us to walk x amount of spaces
+        PauseInput(WALK_SPEED * aSpaces);
+
+        for (int i = 0; i < aSpaces; i++)
+        {
+            Vector3 movement = GetForwardVector3();
+
+            yield return StartCoroutine(Move(movement, false));
+        }
+    }
+
+    //For doors AKA entering/exiting
+    public IEnumerator Teleport(int aMap, int aTile)
+    {
+        //TODO: Fade transition black
+        Camera.main.GetComponent<Camera>().cullingMask = 0;
+
+        //Change map and we are now inside if outside and vice versa
+        Player.ChangeMap(Player.World.GetMap(aMap));
+        IsOutside = !IsOutside;
+        Debug.Log(IsOutside);
+        Tile destinationTile = Player.Map.GetTile(aTile);
+
+        //Go to new tile AKA enter building
+        transform.position = destinationTile.GetTileCoordinates();
+        Player.CurrentTile = destinationTile;
+        
+        yield return new WaitForSeconds(FADE_TRANSTITION);
+
+        //TODO: Fade end
+        Camera.main.GetComponent<Camera>().cullingMask = 1;
+    }
+
+    //For stairs
+    public IEnumerator Teleport(int aTile)
+    {
+        //TODO: Fade transition black
+
+        Tile destinationTile = Player.Map.GetTile(aTile);
+
+        //Go to new tile AKA enter building
+        transform.position = destinationTile.GetTileCoordinates();
+        Player.CurrentTile = destinationTile;
+
+        yield return new WaitForSeconds(FADE_TRANSTITION);
+
+        //TODO: Fade end
     }
 }

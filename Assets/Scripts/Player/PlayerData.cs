@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class PlayerData : MonoBehaviour
 {
-    const int STARTING_TILE = 238;//Index
+    const int STARTING_TILE = 372;//Index
 
     string Name = "RED";
     //money/name/badges/bag?/pokedex?/etc
     public World World { get; private set; }
-    public Map CurrentMap { get; private set; }
+    public Map Map { get; private set; }
     public Tile CurrentTile;
 
     public Bag Bag;
@@ -18,15 +18,15 @@ public class PlayerData : MonoBehaviour
     void Start()
     {
         World = GameObject.FindGameObjectWithTag("World").GetComponent<World>();
-        CurrentMap = World.GetMap(World.StartingMap);
-        CurrentTile = CurrentMap.GetTile(STARTING_TILE);
+        Map = World.GetMap(World.StartingMap);
+        CurrentTile = Map.GetTile(STARTING_TILE);
         transform.position = new Vector3(CurrentTile.GetTileCoordinates().x, CurrentTile.GetTileCoordinates().y);
 
         Bag = new Bag();
     }
 
-    public void ChangeMap()
+    public void ChangeMap(Map aMap)
     {
-        CurrentMap = CurrentTile.GetMap();
+        Map = aMap;
     }
 }

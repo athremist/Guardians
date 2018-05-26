@@ -18,12 +18,7 @@ public class World : MonoBehaviour
 
     void Start()
     {
-
-    }
-
-    void Update()
-    {
-
+        SelectMapConntions();
     }
 
     void InitializeMaps()
@@ -40,7 +35,7 @@ public class World : MonoBehaviour
             {
                 Vector2 pos = new Vector2(map.transform.position.x, map.transform.position.y);
                 Maps[i] = map;
-                Debug.Log(Maps[i].name);
+                //Debug.Log(Maps[i].name);
             }
             else
             {
@@ -104,16 +99,17 @@ public class World : MonoBehaviour
 
     private void SelectMapConntions()
     {
-        //  byte[] maps = Nou,Eas,Sou,Wes
-        //Map 1-SapwoodTown
+        //  byte[] maps = Nou,Eas,Sou,Wes /255->invalid map
+
+        //Map 0-SapwoodTown
         {
-            byte[] maps = { 1, 0, 1, 0};
-            SetMapConnections(1, maps);
+            byte[] maps = { 1, 255, 255, 255};
+            SetMapConnections(0, maps);
         }
-        //Map 2-Route1
+        //Map 1-Route1
         {
-            byte[] maps = { 2, 0, 0, 0 };
-            SetMapConnections(2, maps);
+            byte[] maps = { 2, 255, 0, 255 };
+            SetMapConnections(1, maps);
         }
 
     }
